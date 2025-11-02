@@ -3,7 +3,6 @@ module.exports = {
     "browser": true,
     "es6": true,
     "jest/globals": true,
-    "cypress": true,
     "node": true
   },
   "extends": [
@@ -20,6 +19,10 @@ module.exports = {
   "plugins": [
     "react", "jest"
   ],
+  "globals": {
+    "cy": "readonly",
+    "Cypress": "readonly"
+  },
   "settings": {
     "react": {
       "version": "detect"

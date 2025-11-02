@@ -1,6 +1,5 @@
 pipeline {
   agent any
-
   tools { nodejs 'NodeJS20' }
 
   stages {
@@ -8,78 +7,68 @@ pipeline {
       when { anyOf { branch 'DEV'; branch 'QA'; branch 'main' } }
       steps {
         checkout scm
-        sh 'git fetch --unshallow || true' // fetch-depth: 0 equivalent
       }
     }
 
     stage('Install Dependencies') {
       when { anyOf { branch 'DEV'; branch 'QA'; branch 'main' } }
       steps {
-        sh 'npm install'
-        sh 'npm install --save-dev cross-env'
-        sh 'npm install react@18 react-dom@18'
-        sh 'npx browserslist@latest --update-db'
+        bat '''
+          npm install
+          npm install --save-dev cross-env
+          npm install react@18 react-dom@18
+          npx browserslist@latest --update-db
+        '''
       }
     }
 
     stage('Lint') {
       when { anyOf { branch 'DEV'; branch 'QA'; branch 'main' } }
-      steps {
-        sh 'npm run eslint'
-      }
+      steps { bat 'npm run eslint' }
     }
 
     stage('Build') {
       when { anyOf { branch 'DEV'; branch 'QA'; branch 'main' } }
-      steps {
-        sh 'npm run build:ci'
-      }
+      steps { bat 'npm run build:ci' }
     }
 
     stage('Unit Tests') {
       when { anyOf { branch 'DEV'; branch 'QA'; branch 'main' } }
-      steps {
-        sh 'npm test'
-      }
+      steps { bat 'npm test' }
     }
 
     stage('Start app (background)') {
       when { anyOf { branch 'DEV'; branch 'QA'; branch 'main' } }
       steps {
-        sh '''
-          nohup npm start > server.log 2>&1 &
-          echo $! > server.pid
+        bat '''
+          powershell -NoProfile -Command ^
+            "$p = Start-Process -FilePath npm -ArgumentList 'start' -RedirectStandardOutput server.log -RedirectStandardError server.log -PassThru; ^
+             $p.Id | Out-File -FilePath server.pid -Encoding ascii"
         '''
       }
     }
 
     stage('E2E Tests (cypress action equivalent)') {
       when { anyOf { branch 'DEV'; branch 'QA'; branch 'main' } }
-      steps {
-        // Equivalent to: uses: cypress-io/github-action@v2 with config-file
-        sh 'npx cypress run --config-file cypress.config.js'
-      }
+      steps { bat 'npx cypress run --config-file cypress.config.js' }
     }
 
     stage('Run Cypress E2E tests') {
       when { anyOf { branch 'DEV'; branch 'QA'; branch 'main' } }
-      steps {
-        sh 'npm run test:e2e'
-      }
+      steps { bat 'npm run test:e2e' }
     }
   }
 
   post {
     always {
-      sh '''
-        if [ -f server.pid ]; then
-          kill $(cat server.pid) || true
-          rm -f server.pid
-        fi
-        # optional: show last lines of server log for debugging
-        if [ -f server.log ]; then
-          tail -n +1 server.log | sed -n '1,200p'
-        fi
+      bat '''
+        if exist server.pid (
+          for /f "usebackq delims=" %%p in ("server.pid") do powershell -NoProfile -Command "Stop-Process -Id %%p -ErrorAction SilentlyContinue"
+          del /f /q server.pid
+        )
+        if exist server.log (
+          powershell -NoProfile -Command "Get-Content server.log -TotalCount 200 | ForEach-Object { $_ }"
+        )
       '''
     }
   }

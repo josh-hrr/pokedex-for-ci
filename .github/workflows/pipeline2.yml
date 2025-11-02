@@ -29,16 +29,11 @@ jobs:
         run: |
           # run server in background and save PID to file
           nohup npm start > server.log 2>&1 &
-          echo $! > server.pid
-      
-      - name: Wait for server to be ready 
-        run: npx wait-on http://localhost:5000
+          echo $! > server.pid 
       - name: E2E Tests
         uses: cypress-io/github-action@v2
         with:
-          start: npm run test:e2e
-          wait-on: 'http://localhost:5000'
-          wait-on-timeout: 60000
+          start: npm run test:e2e  
       - name: Stop server (always)
         if: always()
         run: |

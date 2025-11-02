@@ -25,11 +25,26 @@ jobs:
       #  run: npm run build:ci
       - name: Unit Tests
         run: npm test
-      - name: Start Application
-        run: npm start  
+      - name: Start app (background)
+        run: |
+          # run server in background and save PID to file
+          nohup npm start > server.log 2>&1 &
+          echo $! > server.pid
+      
+      - name: Wait for server to be ready 
+        run: npx wait-on http://localhost:5000
       - name: E2E Tests
         uses: cypress-io/github-action@v2
         with:
           start: npm run test:e2e
           wait-on: 'http://localhost:5000'
           wait-on-timeout: 60000
+      - name: Stop server (always)
+        if: always()
+        run: |
+          if [ -f server.pid ]; then
+            kill $(cat server.pid) || true
+            rm -f server.pid
+          fi
+          # optional: show last lines of server log for debugging
+          tail -n +1 server.log | sed -n '1,200p'

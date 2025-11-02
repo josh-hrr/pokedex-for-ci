@@ -33,8 +33,7 @@ jobs:
       - name: E2E Tests
         uses: cypress-io/github-action@v2
         with:
-          config-file: cypress.config.js
-          wait-on: 'http://localhost:5000'
+          config-file: cypress.config.js 
       - name: Run Cypress E2E tests
         run: 
           npm run test:e2e  

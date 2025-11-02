@@ -17,6 +17,8 @@ jobs:
       - name: Install Dependencies
         run: npm install
       - run: npm install --save-dev cross-env
+      - run: npm install react@18 react-dom@18
+      - run: npx browserslist@latest --update-db
       - name: Lint
         run: npm run eslint
       - name: Build

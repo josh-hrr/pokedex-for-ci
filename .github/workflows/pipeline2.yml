@@ -15,10 +15,9 @@ jobs:
         with: 
           node-version: '20'
       - name: Install Dependencies
-        run: npm install
-      - run: npm install --save-dev cross-env
-      - run: npm install react@18 react-dom@18
-      - run: npx browserslist@latest --update-db
+        run: npm ci
+      - name: Update browserslist DB
+        run: npx browserslist@latest --update-db
       - name: Lint
         run: npm run eslint
       #- name: Build
@@ -29,11 +28,11 @@ jobs:
         run: |
           # run server in background and save PID to file
           nohup npm start > server.log 2>&1 &
-          echo $! > server.pid 
+          echo $! > server.pid
       - name: E2E Tests
         uses: cypress-io/github-action@v2
-        with:
-          start: npm run test:e2e  
+        # don't pass a start command here (we already started the app);
+        # action will run Cypress from the installed devDependency
       - name: Stop server (always)
         if: always()
         run: |

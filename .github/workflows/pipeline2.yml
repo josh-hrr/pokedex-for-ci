@@ -21,8 +21,8 @@ jobs:
       - run: npx browserslist@latest --update-db
       - name: Lint
         run: npm run eslint
-      #- name: Build
-      #  run: npm run build:ci
+      - name: Build
+        run: npm run build:ci
       - name: Unit Tests
         run: npm test
       - name: Start app (background)

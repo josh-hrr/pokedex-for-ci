@@ -2,6 +2,13 @@ pipeline {
   agent any
   tools { nodejs 'NodeJS20' }
 
+  environment {
+    // keep Cypress cache inside the workspace, not under systemprofile
+    CYPRESS_CACHE_FOLDER = "${WORKSPACE}\\.cache\\Cypress"
+    CI = 'true'
+  }
+
+
   stages {
     stage('Checkout') {
       when { anyOf { branch 'DEV'; branch 'QA'; branch 'main' } }
@@ -49,8 +56,14 @@ pipeline {
 
     stage('E2E Tests (cypress action equivalent)') {
       when { anyOf { branch 'DEV'; branch 'QA'; branch 'main' } }
-      steps { bat 'npx cypress run --config-file cypress.config.js' }
+      steps {
+        bat '''
+          npx cypress install
+          npx cypress run --headless --browser electron --config-file cypress.config.js
+        '''
+      }
     }
+
 
     stage('Run Cypress E2E tests') {
       when { anyOf { branch 'DEV'; branch 'QA'; branch 'main' } }

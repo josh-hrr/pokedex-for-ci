@@ -15,12 +15,12 @@ pipeline {
         checkout scm
       }
     }
-    
+
     stage('Install Dependencies') {
       when { anyOf { branch 'DEV'; branch 'QA'; branch 'main' } }
       steps {
         bat '''
-          set CYPRESS_INSTALL_BINARY=0
+          set npm_config_ignore_scripts=true
           npm install
           npm install --save-dev cross-env
           npm install react@18 react-dom@18

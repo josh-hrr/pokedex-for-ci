@@ -1,8 +1,8 @@
 import React from 'react'
 import { render, screen } from '@testing-library/react'
 import axiosMock from 'axios'
-import { act } from 'react-dom/test-utils'
-import '@testing-library/jest-dom/extend-expect'
+import { act } from 'react'
+import '@testing-library/jest-dom'
 import App from '../src/App'
 
 jest.mock('axios')
@@ -24,11 +24,11 @@ describe('<App />', () => {
   })
 
   it('shows LoadingSpinner', async () => {
-    axiosMock.get.mockResolvedValueOnce({})
-    await act(async () => {
-      const { getByAltText } = render(<App />)
-      expect(getByAltText('Loading...')).toBeVisible()
-    })
+    // make axios.get return a pending promise so the component stays in loading state
+    axiosMock.get.mockImplementationOnce(() => new Promise(() => {}))
+    render(<App />)
+    // spinner is rendered on initial render (before the effect resolves)
+    expect(screen.getByAltText('Loading...')).toBeInTheDocument()
   })
 
   it('shows error', async () => {

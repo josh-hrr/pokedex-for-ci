@@ -41,6 +41,33 @@ pipeline {
     stage('Unit Tests') {
       when { anyOf { branch 'DEV'; branch 'QA'; branch 'main' } }
       steps { bat 'npm test' }
-    }  
+    } 
+
+    stage('SonarQube Scan') {
+      when { anyOf { branch 'DEV'; branch 'QA'; branch 'main' } }
+      steps {
+        script {
+          def scannerHome = tool name: 'SonarScanner7.3', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+          withSonarQubeEnv('SonarQube2025') {
+            bat """
+              "${scannerHome}\\bin\\sonar-scanner.bat" ^
+                -Dsonar.login=squ_1aeb0dab1b4aa3687bce399e5c7f37695ef2cd40
+            """
+          }
+        }
+      }
+    }
+
+
+    stage('Quality Gate') {
+    when { anyOf { branch 'DEV'; branch 'QA'; branch 'main' } }
+    steps {
+      timeout(time: 10, unit: 'MINUTES') {
+        waitForQualityGate abortPipeline: true
+      }
+    }
+  }
+
+    
   } 
 }

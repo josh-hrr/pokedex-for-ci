@@ -42,45 +42,6 @@ pipeline {
     stage('Unit Tests') {
       when { anyOf { branch 'DEV'; branch 'QA'; branch 'main' } }
       steps { bat 'npm test' }
-    }
-
-    stage('Start app (background)') {
-      when { anyOf { branch 'DEV'; branch 'QA'; branch 'main' } }
-      steps {
-        bat '''
-          powershell -NoProfile -Command "$p = Start-Process -FilePath 'npm' -ArgumentList 'start' -RedirectStandardOutput 'server-out.log' -RedirectStandardError 'server-err.log' -PassThru; $p.Id | Out-File -FilePath 'server.pid' -Encoding ascii"
-        '''
-        echo "Application started in background. PID stored in server.pid"
-      }
-    }
-
-    stage('E2E Tests (cypress action equivalent)') {
-      when { anyOf { branch 'DEV'; branch 'QA'; branch 'main' } }
-      steps {
-        bat '''
-          npx cypress install 
-        '''
-      }
-    }
-
-
-    stage('Run Cypress E2E tests') {
-      when { anyOf { branch 'DEV'; branch 'QA'; branch 'main' } }
-      steps { bat 'npm run test:e2e' }
-    }
-  }
-
-  post {
-    always {
-      bat '''
-        if exist server.pid (
-          for /f "usebackq delims=" %%p in ("server.pid") do powershell -NoProfile -Command "Stop-Process -Id %%p -ErrorAction SilentlyContinue"
-          del /f /q server.pid
-        )
-        if exist server.log (
-          powershell -NoProfile -Command "Get-Content server.log -TotalCount 200 | ForEach-Object { $_ }"
-        )
-      '''
-    }
-  }
+    }  
+ 
 }

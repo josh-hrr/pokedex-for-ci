@@ -41,11 +41,9 @@ pipeline {
       when { anyOf { branch 'DEV'; branch 'QA'; branch 'main' } }
       steps {
         bat '''
-          rem Start the app in background with PowerShell
-          powershell -NoProfile -Command ^
-            "$p = Start-Process -FilePath 'npm' -ArgumentList 'start' -RedirectStandardOutput 'server-out.log' -RedirectStandardError 'server-err.log' -PassThru; ^
-            $p.Id | Out-File -FilePath 'server.pid' -Encoding ascii"
+          powershell -NoProfile -Command "$p = Start-Process -FilePath 'npm' -ArgumentList 'start' -RedirectStandardOutput 'server-out.log' -RedirectStandardError 'server-err.log' -PassThru; $p.Id | Out-File -FilePath 'server.pid' -Encoding ascii"
         '''
+        echo "Application started in background. PID stored in server.pid"
       }
     }
 

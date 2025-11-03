@@ -11,7 +11,7 @@
     "eslint": "eslint ./**/*.{js,jsx}",
     "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider webpack --mode production",
     "build:ci": "node --openssl-legacy-provider ./node_modules/webpack/bin/webpack.js --mode production",
-    "test:e2e": "npx cypress run"
+    "test:e2e": "cypress run --headless --browser electron --config-file cypress.config.js"
   },
   "repository": {
     "type": "git",

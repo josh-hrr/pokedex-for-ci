@@ -58,8 +58,7 @@ pipeline {
       when { anyOf { branch 'DEV'; branch 'QA'; branch 'main' } }
       steps {
         bat '''
-          npx cypress install
-          npx cypress run --headless --browser electron --config-file cypress.config.js
+          npx cypress install 
         '''
       }
     }

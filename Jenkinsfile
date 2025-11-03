@@ -1,6 +1,6 @@
 pipeline {
   agent any
-  tools { nodejs 'NodeJS20' }
+  tools { nodejs 'NodeJS20_11' }
 
   environment { 
     CYPRESS_CACHE_FOLDER = "${WORKSPACE}\\.cache\\Cypress"

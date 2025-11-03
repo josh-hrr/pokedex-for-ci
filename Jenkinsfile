@@ -2,9 +2,7 @@ pipeline {
   agent any
   tools { nodejs 'NodeJS20' }
 
-  environment {
-    // keep Cypress cache inside the workspace, not under systemprofile
-    CYPRESS_CACHE_FOLDER = "${WORKSPACE}\\.cache\\Cypress"
+  environment { 
     CI = 'true'
   }
 

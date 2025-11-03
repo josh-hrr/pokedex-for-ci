@@ -43,5 +43,5 @@ pipeline {
       when { anyOf { branch 'DEV'; branch 'QA'; branch 'main' } }
       steps { bat 'npm test' }
     }  
- 
+  } 
 }

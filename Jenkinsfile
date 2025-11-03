@@ -3,6 +3,7 @@ pipeline {
   tools { nodejs 'NodeJS20' }
 
   environment { 
+    CYPRESS_CACHE_FOLDER = "${WORKSPACE}\\.cache\\Cypress"
     CI = 'true'
   }
 
